@@ -10,16 +10,11 @@ COPY . .
 
 RUN npm run build
 
-# Nginx для сервировки статики
 FROM nginx:alpine
 
-# Копируем кастомную конфигурацию nginx
-COPY default.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Копируем собранное приложение
 COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 80
-
-# Запускаем nginx
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5001/api/v1'//import.meta.env.VITE_API_URL || 'https://localhost:7254/api/v1';
+const API_BASE_URL = 'http://localhost:5001/api/'//import.meta.env.VITE_API_URL || 'https://localhost:7254/api/v1';
 
 class ApiClient {
     constructor(baseUrl) {
@@ -37,89 +37,89 @@ class ApiClient {
 
     // Equipment endpoints
     async getAllEquipment() {
-        return this.request('/equipment/list');
+        return this.request('equipment/list');
     }
 
     async getEquipmentById(id) {
-        return this.request(`/equipment/${id}`);
+        return this.request(`equipment/${id}`);
     }
 
     async createEquipment(data) {
-        return this.request('/equipment', {
+        return this.request('equipment', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async updateEquipment(data) {
-        return this.request('/equipment', {
+        return this.request('equipment', {
             method: 'PUT',
             body: JSON.stringify(data),
         });
     }
 
     async deleteEquipment(id) {
-        return this.request(`/equipment/${id}`, {
+        return this.request(`equipment/${id}`, {
             method: 'DELETE',
         });
     }
 
     // Dashboard endpoints
     async getDashboardSummary() {
-        return this.request('/dashboard/summary');
+        return this.request('dashboard/summary');
     }
 
     // Sensor Data endpoints
     async getPumpSensorData(params = {}) {
         const queryString = new URLSearchParams(params).toString();
-        return this.request(`/sensor-data/pump${queryString ? `?${queryString}` : ''}`);
+        return this.request(`sensor-data/pump${queryString ? `?${queryString}` : ''}`);
     }
 
     async addPumpSensorData(data) {
-        return this.request('/sensor-data/pump', {
+        return this.request('sensor-data/pump', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async detectPumpAnomaly(id) {
-        return this.request(`/sensor-data/pump/${id}/detect-anomaly`, {
+        return this.request(`sensor-data/pump/${id}/detect-anomaly`, {
             method: 'POST',
         });
     }
 
     async getCompressorSensorData(params = {}) {
         const queryString = new URLSearchParams(params).toString();
-        return this.request(`/sensor-data/compressor${queryString ? `?${queryString}` : ''}`);
+        return this.request(`sensor-data/compressor${queryString ? `?${queryString}` : ''}`);
     }
 
     async addCompressorSensorData(data) {
-        return this.request('/sensor-data/compressor', {
+        return this.request('sensor-data/compressor', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async detectCompressorAnomaly(id) {
-        return this.request(`/sensor-data/compressor/${id}/detect-anomaly`, {
+        return this.request(`sensor-data/compressor/${id}/detect-anomaly`, {
             method: 'POST',
         });
     }
 
     async getTurbineSensorData(params = {}) {
         const queryString = new URLSearchParams(params).toString();
-        return this.request(`/sensor-data/turbine${queryString ? `?${queryString}` : ''}`);
+        return this.request(`sensor-data/turbine${queryString ? `?${queryString}` : ''}`);
     }
 
     async addTurbineSensorData(data) {
-        return this.request('/sensor-data/turbine', {
+        return this.request('sensor-data/turbine', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async detectTurbineAnomaly(id) {
-        return this.request(`/sensor-data/turbine/${id}/detect-anomaly`, {
+        return this.request(`sensor-data/turbine/${id}/detect-anomaly`, {
             method: 'POST',
         });
     }
@@ -127,46 +127,46 @@ class ApiClient {
     // Maintenance Prediction endpoints
     async getMaintenancePredictions(params = {}) {
         const queryString = new URLSearchParams(params).toString();
-        return this.request(`/maintenance-prediction${queryString ? `?${queryString}` : ''}`);
+        return this.request(`maintenance-prediction${queryString ? `?${queryString}` : ''}`);
     }
 
     async createMaintenancePrediction(data) {
-        return this.request('/maintenance-prediction', {
+        return this.request('maintenance-prediction', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async predictMaintenance(equipmentId) {
-        return this.request(`/maintenance-prediction/${equipmentId}/predict-maintenance`, {
+        return this.request(`maintenance-prediction/${equipmentId}/predict-maintenance`, {
             method: 'POST',
         });
     }
 
     async acknowledgePrediction(id) {
-        return this.request(`/maintenance-prediction/${id}/acknowledge`, {
+        return this.request(`maintenance-prediction/${id}/acknowledge`, {
             method: 'PUT',
         });
     }
 
     // Analytics endpoints
     async getEquipmentHealthTrend(equipmentId, days = 30) {
-        return this.request(`/analytics/equipment/${equipmentId}/health-trend?days=${days}`);
+        return this.request(`analytics/equipment/${equipmentId}/health-trend?days=${days}`);
     }
 
     // ML Model Management endpoints
     async getModelsStatus() {
-        return this.request('/ml-models/status');
+        return this.request('ml-models/status');
     }
 
     async initializeModels() {
-        return this.request('/ml-models/initialize', {
+        return this.request('ml-models/initialize', {
             method: 'POST',
         });
     }
 
     async retrainModels() {
-        return this.request('/ml-models/retrain', {
+        return this.request('ml-models/retrain', {
             method: 'POST',
         });
     }

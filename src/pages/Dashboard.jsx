@@ -1,32 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import StatCard from "../components/StatCard/StatCard";
 import EquipmentCard from "../components/EquipmentCard/EquipmentCard";
 import WrenchIcon from "../components/Icons/WrenchIcon";
 import BoltIcon from "../components/Icons/BoltIcon";
-import apiClient from "../services/apiClient";
 
 export default function Dashboard({ equipmentList, onSelectEquipment, onRefresh }) {
-    const [dashboardStats, setDashboardStats] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        loadDashboardStats();
-    }, [equipmentList]);
-
-    const loadDashboardStats = async () => {
-        try {
-            const stats = await apiClient.getDashboardSummary();
-            setDashboardStats(stats);
-        } catch (error) {
-            console.error('Failed to load dashboard stats:', error);
-            // Calculate stats from equipment list as fallback
-            calculateStatsFromEquipment();
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const calculateStatsFromEquipment = () => {
+    // Вычисляем статистику из списка оборудования с использованием useMemo
+    const dashboardStats = useMemo(() => {
         const stats = {
             totalEquipment: equipmentList.length,
             equipmentStatus: {
@@ -40,8 +20,8 @@ export default function Dashboard({ equipmentList, onSelectEquipment, onRefresh 
                 ? (equipmentList.reduce((sum, e) => sum + (e.healthScore || 0), 0) / equipmentList.length).toFixed(1)
                 : 0,
         };
-        setDashboardStats(stats);
-    };
+        return stats;
+    }, [equipmentList]);
 
     const criticalCount = dashboardStats?.equipmentStatus?.critical || 0;
     const avgHealth = dashboardStats?.averageHealthScore || 0;

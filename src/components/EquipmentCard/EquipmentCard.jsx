@@ -6,22 +6,22 @@ export default function EquipmentCard({ equipment, onSelect }) {
 
     // Извлекаем метрики в зависимости от типа оборудования
     const getMetrics = () => {
-        if (equipment.type === 'Pump' && equipment.pumpData && equipment.pumpData.length > 0) {
-            const latest = equipment.pumpData[0];
+        if (equipment.type === 'Pump' && equipment.pumpSensors && equipment.pumpSensors.length > 0) {
+            const latest = equipment.pumpSensors[0];
             return {
                 vibration: latest.vibrationX || latest.vibrationY || latest.vibrationZ || 'N/A',
                 temperature: latest.temperature || latest.bearingTemperature || 'N/A',
                 pressure: latest.dischargePressure || latest.suctionPressure || 'N/A',
             };
-        } else if (equipment.type === 'Compressor' && equipment.compressorData && equipment.compressorData.length > 0) {
-            const latest = equipment.compressorData[0];
+        } else if (equipment.type === 'Compressor' && equipment.compressorSensors && equipment.compressorSensors.length > 0) {
+            const latest = equipment.compressorSensors[0];
             return {
                 vibration: latest.vibrationAxial || latest.vibrationRadial || 'N/A',
                 temperature: latest.outletTemperature || latest.inletTemperature || 'N/A',
                 pressure: latest.outletPressure || latest.inletPressure || 'N/A',
             };
-        } else if (equipment.type === 'Turbine' && equipment.turbineData && equipment.turbineData.length > 0) {
-            const latest = equipment.turbineData[0];
+        } else if (equipment.type === 'Turbine' && equipment.turbineSensors && equipment.turbineSensors.length > 0) {
+            const latest = equipment.turbineSensors[0];
             return {
                 vibration: latest.vibrationBearing1 || latest.vibrationBearing2 || 'N/A',
                 temperature: latest.exhaustTemperature || latest.inletTemperature || 'N/A',

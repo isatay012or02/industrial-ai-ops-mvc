@@ -33,7 +33,6 @@ export default function App() {
         } catch (err) {
             console.error('Failed to load equipment data:', err);
             setError('Failed to load equipment data. Using fallback data.');
-            // Используем fallback данные при ошибке
             setEquipmentData(getFallbackData());
         } finally {
             setLoading(false);
@@ -49,11 +48,94 @@ export default function App() {
         try {
             // Загружаем полные данные оборудования с сервера
             const fullData = await apiClient.getEquipmentById(equipment.id);
-            setSelectedEquipment(fullData);
+
+            // Преобразуем данные в формат, ожидаемый компонентом EquipmentDetail
+            const transformedData = transformEquipmentData(fullData);
+            setSelectedEquipment(transformedData);
         } catch (err) {
             console.error('Failed to load equipment details:', err);
-            setSelectedEquipment(equipment);
+            // В случае ошибки используем данные из списка с преобразованием
+            const transformedData = transformEquipmentData(equipment);
+            setSelectedEquipment(transformedData);
         }
+    };
+
+    // Функция для преобразования данных в формат, ожидаемый EquipmentDetail
+    const transformEquipmentData = (equipment) => {
+        let metrics = { vibration: 'N/A', temperature: 'N/A', pressure: 'N/A' };
+        let historicalData = [];
+        let prediction = null;
+
+        // Извлекаем метрики в зависимости от типа оборудования
+        if (equipment.type === 'Pump' && equipment.pumpSensors && equipment.pumpSensors.length > 0) {
+            const latest = equipment.pumpSensors[0];
+            metrics = {
+                vibration: latest.vibrationX || latest.vibrationY || latest.vibrationZ || 'N/A',
+                temperature: latest.temperature || latest.bearingTemperature || 'N/A',
+                pressure: latest.dischargePressure || latest.suctionPressure || 'N/A',
+            };
+
+            // Создаём исторические данные для графика
+            historicalData = equipment.pumpSensors.slice(0, 30).reverse().map((d, i) => ({
+                day: -30 + i,
+                vibration: d.vibrationX || d.vibrationY || 0,
+                temperature: d.temperature || 0,
+            }));
+        } else if (equipment.type === 'Compressor' && equipment.compressorSensors && equipment.compressorSensors.length > 0) {
+            const latest = equipment.compressorSensors[0];
+            metrics = {
+                vibration: latest.vibrationAxial || latest.vibrationRadial || 'N/A',
+                temperature: latest.outletTemperature || latest.inletTemperature || 'N/A',
+                pressure: latest.outletPressure || latest.inletPressure || 'N/A',
+            };
+
+            historicalData = equipment.compressorSensors.slice(0, 30).reverse().map((d, i) => ({
+                day: -30 + i,
+                vibration: d.vibrationAxial || 0,
+                temperature: d.outletTemperature || 0,
+            }));
+        } else if (equipment.type === 'Turbine' && equipment.turbineSensors && equipment.turbineSensors.length > 0) {
+            const latest = equipment.turbineSensors[0];
+            metrics = {
+                vibration: latest.vibrationBearing1 || latest.vibrationBearing2 || 'N/A',
+                temperature: latest.exhaustTemperature || latest.inletTemperature || 'N/A',
+                pressure: latest.inletPressure || 'N/A',
+            };
+
+            historicalData = equipment.turbineSensors.slice(0, 30).reverse().map((d, i) => ({
+                day: -30 + i,
+                vibration: d.vibrationBearing1 || 0,
+                temperature: d.exhaustTemperature || 0,
+            }));
+        }
+
+        // Если нет исторических данных, создаём fallback
+        if (historicalData.length === 0) {
+            historicalData = Array.from({ length: 7 }, (_, i) => ({
+                day: -30 + i * 5,
+                vibration: Math.random() * 5 + 2,
+                temperature: Math.random() * 10 + 70,
+            }));
+        }
+
+        // Проверяем predictions
+        if (equipment.predictions && equipment.predictions.length > 0) {
+            const latestPrediction = equipment.predictions.find(p => !p.isAcknowledged);
+            if (latestPrediction) {
+                prediction = {
+                    timeToFailure: `${Math.ceil(latestPrediction.predictedDaysToFailure || 0)} days`,
+                    confidence: `${Math.round((latestPrediction.confidence || 0) * 100)}%`,
+                    reason: latestPrediction.failureType || 'Anomaly detected',
+                };
+            }
+        }
+
+        return {
+            ...equipment,
+            metrics,
+            historicalData,
+            prediction,
+        };
     };
 
     if (loading) {

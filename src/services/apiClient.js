@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5001/api/'//import.meta.env.VITE_API_URL || 'https://localhost:7254/api/v1';
+const API_BASE_URL = 'http://localhost:5282/api/';
 
 class ApiClient {
     constructor(baseUrl) {
@@ -168,6 +168,18 @@ class ApiClient {
     async retrainModels() {
         return this.request('ml-models/retrain', {
             method: 'POST',
+        });
+    }
+
+    /**
+     * Ask a question to the RAG AI Assistant
+     * @param {string} question - The question to ask
+     * @returns {Promise<{hasAnswer: boolean, answer: string, sources: Array}>}
+     */
+    async askAssistant(question) {
+        return this.request('assistant/ask', {
+            method: 'POST',
+            body: JSON.stringify({ question }),
         });
     }
 }
